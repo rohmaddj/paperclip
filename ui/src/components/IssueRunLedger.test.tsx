@@ -615,9 +615,13 @@ describe("IssueRunLedger", () => {
     // happened inside the ledger useMemo, so it took the entire issue page down
     // rather than degrading the ledger. Live runs are typed `string | Date | null`
     // (api/heartbeats.ts), so a Date is a legitimate input shape here.
+    //
+    // The stored run must not share the active run's id: when the ids match,
+    // mergeRuns keeps the stored copy and the live dates never reach
+    // toIsoString, so the test would pass without the fix.
     expect(() =>
       renderLedger({
-        runs: [createRun({ runId: "run-live-1", status: "running", finishedAt: null })],
+        runs: [createRun({ runId: "run-stored-1", status: "running", finishedAt: null })],
         activeRun: createActiveRun({
           startedAt: new Date("not-a-date"),
           finishedAt: new Date("not-a-date"),
